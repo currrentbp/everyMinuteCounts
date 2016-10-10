@@ -77,14 +77,15 @@ public class RuleServiceImpl implements RuleService {
 		}
 
 		Rule noWinRule = nowinRules.get(0);// 获取没有中奖的概率//这个规则应该只有一个
-		String probability = noWinRule.getOther1();
-		if (null == probability || "".equals(probability)) {
+		String probability = null == noWinRule ? "" : noWinRule.getOther1();
+		if (null == probability || "".equals(probability.trim())) {
 			return true;
 		}
 
 		int noWinprob1 = (int) (Float.parseFloat(probability) * StaticProperty.maxInt / 100);// 因为概率是100%
 		int r1 = RandomUtil.getLargeRandomNum(StaticProperty.maxInt);
-
+		System.out.println("===>isWin: nowinprob:"+noWinprob1+" random1:"+r1);
+		
 		if (r1 <= noWinprob1) {// 不中奖
 			return false;
 		}
@@ -104,6 +105,7 @@ public class RuleServiceImpl implements RuleService {
 		// 1、先抽奖，定位中的是什么奖
 		// 2、根据能否中奖，获取奖品的规则
 		// 3、修改奖品名额
+		
 		Rule awardRule = getAward(activityId, rules, customerId);// 可能为空
 
 		boolean flag = (null != awardRule) && couldWin(activityId, rules, customerId, awardRule);
@@ -176,6 +178,7 @@ public class RuleServiceImpl implements RuleService {
 		// 4、根据规则判断是否能中奖：活动期间该客户的名额限制
 		// 5、根据规则判断是否能中奖：活动期间该客户的单日中奖名额
 
+		//TODO not complete
 		boolean flag1 = checkSumAwardNum(rules, activityId, customerId, awardRule);
 		boolean flag2 = flag1 && checkEverydayAwardNum(rules, activityId, customerId, awardRule);
 		boolean flag3 = flag2 && checkTimeSumAwardNum(rules, activityId, customerId, awardRule);
@@ -265,7 +268,7 @@ public class RuleServiceImpl implements RuleService {
 	 */
 	private boolean checkCustomerEveryDaySumAwardNum(List<Rule> rules, Long activityId, Long customerId,
 			Rule awardRule) {
-		//TODO not work
+		// TODO not work
 		return false;
 	}
 
@@ -278,12 +281,12 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean checkCustomerAwardNum(List<Rule> rules, Long activityId, Long customerId, Rule awardRule) {
-		//TODO not work
+		// TODO not work
 		return false;
 	}
 
 	/**
-	 * 
+	 * 检查每个时间段的奖品总名额
 	 * @param rules
 	 * @param activityId
 	 * @param customerId
@@ -291,9 +294,23 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean checkTimeSumAwardNum(List<Rule> rules, Long activityId, Long customerId, Rule awardRule) {
-		//TODO not work
-		return false;
+		if (null == awardRule) {
+			return false;
+		}
+
+		Long awardId = Long.parseLong(awardRule.getOther1());
+		Integer timeAwardNum = getTimeSumAwardRuleByAwardId(rules, awardId);
+
+		Integer timeAwardNumNow = ruleDao.getTimeAwardNumNow(activityId, awardId);
+
+		if (timeAwardNum <= timeAwardNumNow) {// 名额已满
+			return false;
+		}
+
+		return true;
 	}
+
+	
 
 	/**
 	 * 检查每天的总名额,只检查名额，不参与修改名额
@@ -311,9 +328,6 @@ public class RuleServiceImpl implements RuleService {
 
 		Long awardId = Long.parseLong(awardRule.getOther1());
 		Integer everydayAwardNum = getEverydayAwardNumRuleByAwardId(rules, awardId);
-		// 1、获取当前总名额，
-		// 2、如果能获取名额，就添加一个
-		// 3、如果名额超过了，就减少一个
 
 		Integer everydayAwardNumNow = ruleDao.getEverydayAwardNumNow(activityId, awardId);
 
@@ -340,23 +354,12 @@ public class RuleServiceImpl implements RuleService {
 
 		Long awardId = Long.parseLong(awardRule.getOther1());
 		Integer sumAwardNum = getSumAwardNumRuleByAwardId(rules, awardId);
-		// 1、获取当前总名额，
-		// 2、如果能获取名额，就添加一个
-		// 3、如果名额超过了，就减少一个
 
 		Integer sumAwardNumNow = ruleDao.getSumAwardNumNow(activityId, awardId);
 
 		if (sumAwardNum <= sumAwardNumNow) {// 名额已满
 			return false;
 		}
-		// Integer sumAwardNumAfterAdd =
-		// ruleDao.addOneNumFromSumAwardNum(activityId,awardId);//需要获得返回的总名额
-		//
-		// if(sumAwardNumAfterAdd > sumAwardNum){//说明名额超过了
-		// //减除刚才的名额
-		// ruleDao.deleteOneNumFromSumAwardNum(activityId,awardId);
-		// return false;
-		// }
 
 		return true;
 	}
@@ -473,6 +476,23 @@ public class RuleServiceImpl implements RuleService {
 	 */
 	private Integer getEverydayAwardNumRuleByAwardId(List<Rule> rules, Long awardId) {
 		List<Rule> rules1 = getRulesByType(rules, RuleType.RULE_ONE_DAY_AWARD_NUM.getValue());
+
+		if (null == rules1 || 0 == rules1.size()) {
+			return -1;
+		}
+		Integer result = -1;
+
+		for (int i = 0; i < rules1.size(); i++) {
+			if (rules1.get(i).getOther1().equals("" + awardId)) {
+				result = rules1.get(i).getRule1();
+			}
+		}
+
+		return result;
+	}
+	
+	private Integer getTimeSumAwardRuleByAwardId(List<Rule> rules, Long awardId) {
+		List<Rule> rules1 = getRulesByType(rules, RuleType.RULE_ONE_TIME_AWARD_NUM.getValue());
 
 		if (null == rules1 || 0 == rules1.size()) {
 			return -1;

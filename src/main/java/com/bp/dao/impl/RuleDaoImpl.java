@@ -116,6 +116,14 @@ public class RuleDaoImpl implements RuleDao {
 
 		return (Integer) SerializeUtil.unserialize(everydayAwardNumNow);
 	}
+
+	@Override
+	public Integer getTimeAwardNumNow(Long activityId, Long awardId) {
+		byte[] timeAwardNumNow = jedis.get(("ruleAward_timeAwardNumNow_" + activityId + "_" + awardId+"").getBytes());
+
+		return (Integer) SerializeUtil.unserialize(timeAwardNumNow);
+	}
+	
 	
 	//========第一层方法=============================华丽分割线=====================================//
 

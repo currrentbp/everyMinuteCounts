@@ -59,4 +59,12 @@ public interface RuleDao {
 	 * @return
 	 */
 	public Integer getEverydayAwardNumNow(Long activityId, Long awardId);
+	
+	/**
+	 * 获取该活动的该奖品的现在的该时间段名额数（即已经使用的名额数）
+	 * @param activityId
+	 * @param awardId
+	 * @return
+	 */
+	public Integer getTimeAwardNumNow(Long activityId, Long awardId);
 }

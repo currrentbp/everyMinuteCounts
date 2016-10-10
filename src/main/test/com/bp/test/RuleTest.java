@@ -236,8 +236,16 @@ public class RuleTest extends BaseTest {
 		System.out.println(JSON.toJSON(ruleService.getRulesByActivityId(1001L)));
 	}
 
+	/*
+	 * 1、先判断是否中奖
+	 * 2、如果不中奖，直接就给不中奖的规则
+	 * 3、如果中奖，判断出中哪个奖品，如果所中的奖品没有名额了，则直接没有中奖
+	 * 4、如果存在奖品，则中奖了。
+	 */
 	@Test
 	public void isWin() {
+		System.out.println("===>"+JSON.toJSON(ruleService.isWin(1001L, ruleService.getRulesByActivityId(1001L),
+				15711310502L)));
 	}
 
 }
