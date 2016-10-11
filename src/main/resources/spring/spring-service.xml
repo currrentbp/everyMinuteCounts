@@ -6,5 +6,6 @@
 	
 	<bean id="activityService" class="com.bp.service.impl.ActivityServiceImpl"></bean>
 	<bean id="ruleService" class="com.bp.service.impl.RuleServiceImpl"></bean>
+	<bean id="queueService" class="com.bp.service.impl.QueueServiceImpl"></bean>
 
 </beans>

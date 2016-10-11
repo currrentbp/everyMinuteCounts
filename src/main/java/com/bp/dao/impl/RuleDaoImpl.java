@@ -13,6 +13,7 @@ import com.bp.entity.Rule;
 import com.bp.statusOrType.RuleType;
 import com.bp.util.RedisUtil;
 import com.bp.util.SerializeUtil;
+import com.bp.util.TimeUtil;
 
 import redis.clients.jedis.Jedis;
 
@@ -119,10 +120,25 @@ public class RuleDaoImpl implements RuleDao {
 
 	@Override
 	public Integer getTimeAwardNumNow(Long activityId, Long awardId) {
+		String time = TimeUtil.currentTimeByFormat("yyyyMMddHH");
 		byte[] timeAwardNumNow = jedis.get(("ruleAward_timeAwardNumNow_" + activityId + "_" + awardId+"").getBytes());
 
 		return (Integer) SerializeUtil.unserialize(timeAwardNumNow);
 	}
+
+	@Override
+	public Integer getCustomerAwardNumNow(Long activityId, Long awardId) {
+		byte[] customerAwardNumNow = jedis.get(("ruleAward_customerAwardNumNow_" + activityId + "_" + awardId+"").getBytes());
+
+		return (Integer) SerializeUtil.unserialize(customerAwardNumNow);
+	}
+
+	@Override
+	public Integer getCustomerEveryDaySumAwardNumNow(Long activityId, Long awardId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	
 	
 	//========第一层方法=============================华丽分割线=====================================//

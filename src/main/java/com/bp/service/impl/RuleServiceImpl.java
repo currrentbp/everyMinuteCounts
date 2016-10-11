@@ -84,8 +84,8 @@ public class RuleServiceImpl implements RuleService {
 
 		int noWinprob1 = (int) (Float.parseFloat(probability) * StaticProperty.maxInt / 100);// 因为概率是100%
 		int r1 = RandomUtil.getLargeRandomNum(StaticProperty.maxInt);
-		System.out.println("===>isWin: nowinprob:"+noWinprob1+" random1:"+r1);
-		
+		System.out.println("===>isWin: nowinprob:" + noWinprob1 + " random1:" + r1);
+
 		if (r1 <= noWinprob1) {// 不中奖
 			return false;
 		}
@@ -105,16 +105,27 @@ public class RuleServiceImpl implements RuleService {
 		// 1、先抽奖，定位中的是什么奖
 		// 2、根据能否中奖，获取奖品的规则
 		// 3、修改奖品名额
-		
+
+		// 中奖的奖品规则
 		Rule awardRule = getAward(activityId, rules, customerId);// 可能为空
 
 		boolean flag = (null != awardRule) && couldWin(activityId, rules, customerId, awardRule);
 
 		// 表示能中奖
 		if (flag) {
-			// TODO 需要修改相关数据
-			boolean changeOk = changeAwardNum(activityId, rules, customerId, awardRule);
-			return changeOk ? awardRule : noWinRule;
+			// TODO 先做
+			boolean changeAwardNumFlag = false;
+			boolean changeCustomerNumFlag = false;
+
+			synchronized (awardRule) {
+				// TODO Not work
+				// 修改奖品的相关数量
+				changeAwardNumFlag = changeAwardNum(activityId, rules, customerId, awardRule);
+				// TODO Not work
+				// 修改该客户的相关数量
+				changeCustomerNumFlag = changeCustomreNum(activityId, rules, customerId, awardRule);
+			}
+			return changeAwardNumFlag && changeCustomerNumFlag ? awardRule : noWinRule;
 		} else {// 不能中奖
 			return noWinRule;
 		}
@@ -126,6 +137,20 @@ public class RuleServiceImpl implements RuleService {
 	}
 
 	// =====下面是服务层的子方法=====================华丽分割线================================//
+	/**
+	 * 修改客户的相关数量:该客户该活动的总中奖数，该活动的当日的中奖次数
+	 * 
+	 * @param activityId
+	 * @param rules
+	 * @param customerId
+	 * @param awardRule
+	 * @return
+	 */
+	private boolean changeCustomreNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
+		// TODO Not work
+		return false;
+	}
+
 	/**
 	 * 抽奖：抽的是中的奖品
 	 * 
@@ -178,18 +203,19 @@ public class RuleServiceImpl implements RuleService {
 		// 4、根据规则判断是否能中奖：活动期间该客户的名额限制
 		// 5、根据规则判断是否能中奖：活动期间该客户的单日中奖名额
 
-		//TODO not complete
 		boolean flag1 = checkSumAwardNum(rules, activityId, customerId, awardRule);
 		boolean flag2 = flag1 && checkEverydayAwardNum(rules, activityId, customerId, awardRule);
-		boolean flag3 = flag2 && checkTimeSumAwardNum(rules, activityId, customerId, awardRule);
+		boolean flag3 = flag2;// && checkTimeSumAwardNum(rules, activityId,
+								// customerId, awardRule);
 		boolean flag4 = flag3 && checkCustomerAwardNum(rules, activityId, customerId, awardRule);
-		boolean flag5 = flag4 && checkCustomerEveryDaySumAwardNum(rules, activityId, customerId, awardRule);
+		boolean flag5 = flag4;// && checkCustomerEveryDaySumAwardNum(rules,
+								// activityId, customerId, awardRule);
 
 		return flag5;
 	}
 
 	/**
-	 * 修改名额
+	 * 修改相关名额
 	 * 
 	 * @param activityId
 	 * @param rules
@@ -198,8 +224,27 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean changeAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
+		// TODO not work
+		/*
+		 * 1、获取每天活动名额， 2、增加该活动的当天的使用名额， 3、判断是否超过名额，否认减名额
+		 */
+		//TODO not work
+		boolean addEveryDayAwardNumFlag = addEveryDayAwardNum(activityId, rules, customerId, awardRule) 
+				? true : multEveryDayAwardNum(activityId, rules, customerId, awardRule);
+		
+		boolean addSumAwardNumFlag = addEveryDayAwardNumFlag ? 
+				addSumAwardNum(activityId, rules, customerId, awardRule) : 
+				multSumAwardNum(activityId, rules, customerId, awardRule)
+				&& multEveryDayAwardNum(activityId, rules, customerId, awardRule);
+
 		return false;
 	}
+
+	
+
+	
+
+	
 
 	/**
 	 * 根据rule1字段排序
@@ -235,6 +280,56 @@ public class RuleServiceImpl implements RuleService {
 
 	// ====================华丽分割线================================//
 
+
+	/**
+	 * 减少该活动的总名额（使用数）
+	 * @param activityId
+	 * @param rules
+	 * @param customerId
+	 * @param awardRule
+	 * @return
+	 */
+	private boolean multSumAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
+		// TODO not work
+		return false;
+	}
+
+	/**
+	 * 增加该活动的总名额（使用数）
+	 * @param activityId
+	 * @param rules
+	 * @param customerId
+	 * @param awardRule
+	 * @return
+	 */
+	private boolean addSumAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
+		// TODO not work
+		return false;
+	}
+	/**
+	 * 减少该活动的每天名额的使用量
+	 * @param activityId
+	 * @param rules
+	 * @param customerId
+	 * @param awardRule
+	 * @return
+	 */
+	private boolean multEveryDayAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
+		// TODO not work
+		return false;
+	}
+	/**
+	 * 增加该活动的每天的名额使用量
+	 * @param activityId
+	 * @param rules
+	 * @param customerId
+	 * @param awardRule
+	 * @return
+	 */
+	private boolean addEveryDayAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
+		// TODO not work
+		return false;
+	}
 	/**
 	 * 根据中奖的概率规则获取奖品规则:有可能为空
 	 * 
@@ -268,11 +363,24 @@ public class RuleServiceImpl implements RuleService {
 	 */
 	private boolean checkCustomerEveryDaySumAwardNum(List<Rule> rules, Long activityId, Long customerId,
 			Rule awardRule) {
-		// TODO not work
-		return false;
+		if (null == awardRule) {
+			return false;
+		}
+
+		Long awardId = Long.parseLong(awardRule.getOther1());
+		Integer customerEveryDaySumAwardNum = getTimeSumAwardRuleByAwardId(rules, awardId);
+
+		Integer customerEveryDaySumAwardNumNow = ruleDao.getCustomerEveryDaySumAwardNumNow(activityId, awardId);
+
+		if (customerEveryDaySumAwardNum <= customerEveryDaySumAwardNumNow) {// 名额已满
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
+	 * 检查该客户的总中奖名额
 	 * 
 	 * @param rules
 	 * @param activityId
@@ -281,12 +389,25 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean checkCustomerAwardNum(List<Rule> rules, Long activityId, Long customerId, Rule awardRule) {
-		// TODO not work
-		return false;
+		if (null == awardRule) {
+			return false;
+		}
+
+		Long awardId = Long.parseLong(awardRule.getOther1());
+		Integer customerAwardNum = getTimeSumAwardRuleByAwardId(rules, awardId);
+
+		Integer customerAwardNumNow = ruleDao.getCustomerAwardNumNow(activityId, awardId);
+
+		if (customerAwardNum <= customerAwardNumNow) {// 名额已满
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
 	 * 检查每个时间段的奖品总名额
+	 * 
 	 * @param rules
 	 * @param activityId
 	 * @param customerId
@@ -309,8 +430,6 @@ public class RuleServiceImpl implements RuleService {
 
 		return true;
 	}
-
-	
 
 	/**
 	 * 检查每天的总名额,只检查名额，不参与修改名额
@@ -490,7 +609,7 @@ public class RuleServiceImpl implements RuleService {
 
 		return result;
 	}
-	
+
 	private Integer getTimeSumAwardRuleByAwardId(List<Rule> rules, Long awardId) {
 		List<Rule> rules1 = getRulesByType(rules, RuleType.RULE_ONE_TIME_AWARD_NUM.getValue());
 

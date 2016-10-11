@@ -6,6 +6,7 @@
 	
 	<bean id="activityDaoImpl" class="com.bp.dao.impl.ActivityDaoImpl"></bean>
 	<bean id="ruleDaoImpl" class="com.bp.dao.impl.RuleDaoImpl"></bean>
+	<bean id="queueDaoImpl" class="com.bp.dao.impl.QueueDaoImpl"></bean>
 	
 	<bean id="jedis" class="com.bp.util.RedisUtil"></bean>
 

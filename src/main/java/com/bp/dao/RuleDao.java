@@ -67,4 +67,18 @@ public interface RuleDao {
 	 * @return
 	 */
 	public Integer getTimeAwardNumNow(Long activityId, Long awardId);
+	/**
+	 * 获取该客户的该活动的总中奖名额数（即已经使用的名额数）
+	 * @param activityId
+	 * @param awardId
+	 * @return
+	 */
+	public Integer getCustomerAwardNumNow(Long activityId, Long awardId);
+	/**
+	 * 获取该客户的该活动的当天中奖名额数（即已经使用的名额数）
+	 * @param activityId
+	 * @param awardId
+	 * @return
+	 */
+	public Integer getCustomerEveryDaySumAwardNumNow(Long activityId, Long awardId);
 }
