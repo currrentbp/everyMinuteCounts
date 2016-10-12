@@ -22,9 +22,9 @@ public interface QueueService {
 	/**
 	 * 从队列头部移除一个人
 	 * @param activityId
-	 * @return
+	 * @return 返回被删除的customer
 	 */
-	public boolean removePerson(Long activityId);
+	public String removePerson(Long activityId);
 	
 	/**
 	 * 从队列头部 获取一个人

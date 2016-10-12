@@ -26,7 +26,7 @@ public interface QueueDao {
 	 * @param activityId
 	 * @return
 	 */
-	public boolean removePerson(Long activityId);
+	public String removePerson(Long activityId);
 
 	/**
 	 * 从队列头部 获取一个人，可能队列中没有人

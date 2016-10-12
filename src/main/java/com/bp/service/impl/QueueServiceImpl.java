@@ -11,12 +11,12 @@ public class QueueServiceImpl implements QueueService {
 
 	@Override
 	public boolean addPerson(Long activityId, Long customer) {
-		return addPerson(activityId, customer);
+		return queueDao.addPerson(activityId, customer);
 	}
 
 
 	@Override
-	public boolean removePerson(Long activityId) {
+	public String removePerson(Long activityId) {
 		return queueDao.removePerson(activityId);
 	}
 

@@ -20,16 +20,14 @@ public class QueueDaoImpl implements QueueDao {
 	}
 
 	@Override
-	public boolean removePerson(Long activityId) {
+	public String removePerson(Long activityId) {
 		Long length = jedis.llen(("queue_" + activityId).getBytes());
 
 		if (length == 0) {
-			return false;
+			return null;
 		}
 		
-		String customerId = jedis.lpop("queue_"+activityId);
-		//TODO 没有完成
-		return false;
+		return jedis.lpop("queue_"+activityId);
 	}
 
 	@Override

@@ -15,24 +15,23 @@ import com.bp.service.QueueService;
  *
  */
 public class QueueServiceTest extends BaseTest {
-	private final static Logger logger = Logger.getLogger(ActivityTest.class);
+	private final static Logger logger = Logger.getLogger(QueueServiceTest.class);
 
 	@Autowired
 	QueueService queueService;
 	
 	@Test
 	public void addPerson() {
-		System.out.println("===>addPerson:"+JSON.toJSONString(queueService.addPerson(1001L, 10002L)));
+		logger.info("===>addPerson:"+JSON.toJSONString(queueService.addPerson(1001L, 10002L)));
 	}
 
-
+	@Test
 	public void removePerson() {
-		//TODO 先做
-		System.out.println("===>removePerson:"+JSON.toJSONString(queueService.removePerson(1001L)));
+		logger.info("===>removePerson:"+JSON.toJSONString(queueService.removePerson(1L)));
 	}
 
 	@Test
 	public void getPerson() {
-		System.out.println("===>getPerson: customerId:"+JSON.toJSONString(queueService.getPerson(1001L)));
+		logger.info("===>getPerson: customerId:"+JSON.toJSONString(queueService.getPerson(1001L)));
 	}
 }
