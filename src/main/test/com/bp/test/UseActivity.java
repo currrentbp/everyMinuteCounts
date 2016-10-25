@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.bp.service.ActivityService;
 import com.bp.service.RuleService;
+import com.bp.service.UseActivityService;
 
 /**
  * 
@@ -22,7 +23,9 @@ public class UseActivity extends BaseTest {
 	ActivityService activityService;
 	@Autowired
 	RuleService ruleService;
-
+	@Autowired
+	UseActivityService useActivityService;
+	
 	@Test
 	public void useActivity() {
 		
@@ -31,6 +34,9 @@ public class UseActivity extends BaseTest {
 		 * 2、插入队列
 		 * 3、唤醒队列
 		 */
+		
+		
+		
 
 	}
 
