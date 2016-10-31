@@ -23,6 +23,11 @@ public class UseActivityServiceImpl implements UseActivityService {
 		// TODO not work
 		return null;
 	}
+
+	@Override
+	public boolean participateActivity(Long activityId, Long customerId) {
+		return false;
+	}
 	
 	
 	

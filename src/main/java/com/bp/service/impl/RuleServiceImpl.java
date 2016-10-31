@@ -7,6 +7,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
+import com.bp.dao.CustomerAwardDao;
 import com.bp.dao.RuleDao;
 import com.bp.entity.Rule;
 import com.bp.entity.StaticProperty;
@@ -18,11 +19,12 @@ public class RuleServiceImpl implements RuleService {
 
 	@Autowired
 	RuleDao ruleDao;
+	@Autowired
+	CustomerAwardDao cutomerAwardDao;
 
 	// ====下面的是服务层公开的方法========================华丽分割线============================================//
 	@Override
 	public Rule getRuleById(Long activityId, Long id) {
-
 		return ruleDao.getRuleById(activityId, id);
 	}
 
@@ -94,7 +96,7 @@ public class RuleServiceImpl implements RuleService {
 	}
 
 	@Override
-	public Rule calculationWin(Long activityId, List<Rule> rules, Long customerId) {
+	public synchronized Rule calculationWin(Long activityId, List<Rule> rules, Long customerId) {
 		if (null == rules || 0 == rules.size()) {// 一般不会的。。。。。
 			return null;
 		}
@@ -118,7 +120,6 @@ public class RuleServiceImpl implements RuleService {
 			boolean changeCustomerNumFlag = false;
 
 			synchronized (awardRule) {
-				// TODO Not work
 				// 修改奖品的相关数量
 				changeAwardNumFlag = changeAwardNum(activityId, rules, customerId, awardRule);
 				// TODO Not work
@@ -147,8 +148,7 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean changeCustomreNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
-		// TODO Not work
-		return false;
+		return cutomerAwardDao.addWinRecord(activityId, customerId, awardRule.getId());
 	}
 
 	/**
@@ -224,20 +224,14 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean changeAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
-		// TODO not work
 		/*
-		 * 1、获取每天活动名额， 2、增加该活动的当天的使用名额， 3、判断是否超过名额，否认减名额
+		 * 1、获取每天活动名额， 2、增加该活动的当天的使用名额
 		 */
-		//TODO not work
-		boolean addEveryDayAwardNumFlag = addEveryDayAwardNum(activityId, rules, customerId, awardRule) 
-				? true : multEveryDayAwardNum(activityId, rules, customerId, awardRule);
+		boolean addEveryDayAwardNumFlag = addEveryDayAwardNum(activityId, rules, customerId, awardRule);
 		
-		boolean addSumAwardNumFlag = addEveryDayAwardNumFlag ? 
-				addSumAwardNum(activityId, rules, customerId, awardRule) : 
-				multSumAwardNum(activityId, rules, customerId, awardRule)
-				&& multEveryDayAwardNum(activityId, rules, customerId, awardRule);
+		boolean addSumAwardNumFlag = addSumAwardNum(activityId, rules, customerId, awardRule);
 
-		return false;
+		return addEveryDayAwardNumFlag && addSumAwardNumFlag;
 	}
 
 	
@@ -303,8 +297,11 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean addSumAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
-		// TODO not work
-		return false;
+		if(null == awardRule){//如果没有规则表示直接通过
+			return true;
+		}
+		
+		return ruleDao.addOneNumFromSumAwardNum(activityId, awardRule.getId()) > 0;
 	}
 	/**
 	 * 减少该活动的每天名额的使用量
@@ -327,8 +324,11 @@ public class RuleServiceImpl implements RuleService {
 	 * @return
 	 */
 	private boolean addEveryDayAwardNum(Long activityId, List<Rule> rules, Long customerId, Rule awardRule) {
-		// TODO not work
-		return false;
+		if(null == awardRule){//如果没有规则表示直接通过
+			return true;
+		}
+		
+		return ruleDao.addOneNumFromEverydayAwardNum(activityId, awardRule.getId()) > 0;
 	}
 	/**
 	 * 根据中奖的概率规则获取奖品规则:有可能为空

@@ -102,6 +102,16 @@ public class RuleDaoImpl implements RuleDao {
 
 		return Integer.parseInt(""+sumAwardNumNow);
 	}
+	
+	
+
+	@Override
+	public Integer addOneNumFromEverydayAwardNum(Long activityId, Long awardId) {
+		Long sumAwardNumNow = jedis.incr("ruleAward_everydayAwardNumNow_" + activityId + "_" 
+					+ TimeUtil.currentTimeByFormat("yyyyMMdd") +"_" + awardId+"");
+
+		return Integer.parseInt(""+sumAwardNumNow);
+	}
 
 	@Override
 	public Integer deleteOneNumFromSumAwardNum(Long activityId, Long awardId) {
@@ -135,7 +145,7 @@ public class RuleDaoImpl implements RuleDao {
 
 	@Override
 	public Integer getCustomerEveryDaySumAwardNumNow(Long activityId, Long awardId) {
-		// TODO Auto-generated method stub
+		// TODO not work
 		return null;
 	}
 	

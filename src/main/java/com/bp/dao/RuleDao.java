@@ -46,6 +46,13 @@ public interface RuleDao {
 	 */
 	public Integer addOneNumFromSumAwardNum(Long activityId, Long awardId);
 	/**
+	 * 在该活动的该奖品的每天总名额中增加一个使用名额
+	 * @param activityId
+	 * @param awardId
+	 * @return
+	 */
+	public Integer addOneNumFromEverydayAwardNum(Long activityId, Long awardId);
+	/**
 	 * 在该活动的该奖品的总名额中减少一个使用名额
 	 * @param activityId
 	 * @param awardId
